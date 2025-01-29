@@ -1,23 +1,49 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, AuthError, AuthResponse } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl: string | undefined = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey: string | undefined = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase environment variables are missing.');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/dashboard`
+/**
+ * Sign in with Google OAuth
+ */
+export const signInWithGoogle = async (): Promise<AuthResponse> => {
+  try {
+    const { data, error }: { data: AuthResponse | null; error: AuthError | null } =
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+    if (error) {
+      throw new Error(error.message);
     }
-  });
-  
-  if (error) throw error;
-  return data;
+
+    return data as AuthResponse;
+  } catch (error) {
+    console.error('Google sign-in error:', error);
+    throw error;
+  }
 };
 
-export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+/**
+ * Sign out user
+ */
+export const signOut = async (): Promise<void> => {
+  try {
+    const { error }: { error: AuthError | null } = await supabase.auth.signOut();
+    if (error) {
+      throw new Error(error.message);
+    }
+  } catch (error) {
+    console.error('Sign-out error:', error);
+    throw error;
+  }
 };
