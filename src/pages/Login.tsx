@@ -1,12 +1,16 @@
 import React from 'react';
 import { signInWithGoogle } from '../lib/supabase';
 
-export function Login() {
-  const handleGoogleLogin = async () => {
+export const Login: React.FC = () => {
+  const handleGoogleLogin = async (): Promise<void> => {
     try {
       await signInWithGoogle();
-    } catch (error) {
-      console.error('Error signing in with Google:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error signing in with Google:', error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
     }
   };
 
@@ -41,4 +45,4 @@ export function Login() {
       </div>
     </div>
   );
-}
+};
