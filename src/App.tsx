@@ -6,18 +6,7 @@ import { AuthGuard } from './components/AuthGuard';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/dashboard"
-        element={
-          <AuthGuard>
             <Dashboard />
-          </AuthGuard>
-        }
-      />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
   );
 }
 
